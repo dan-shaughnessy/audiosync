@@ -110,6 +110,21 @@ fn event_framing_swaps_the_roles() {
     );
 }
 
+// Regression: macOS 27.2.1 AirTunes/1005.13.5 refuses AudioSync's
+// optional User-Agent before pairing. Exercise the complete session path.
+#[test]
+fn receiver_rejecting_custom_user_agent_can_complete_pairing_and_setup() {
+    let mut fake = FakeAp2::new();
+    fake.reject_sender_user_agent = true;
+    let rig = Ap2Rig::new(ap2_config(), fake);
+    assert!(rig.ready(), "{:?} {:?}", rig.keys(), rig.events);
+    for (request, _) in &rig.fake.requests {
+        assert!(!request.headers.contains("User-Agent"), "{}", request.uri);
+        assert!(request.headers.contains("CSeq"));
+        assert!(request.headers.contains("Client-Instance"));
+    }
+}
+
 // covers: P41, P42, P43, P44, P104, P168
 // Part of P153: the order and framing after a transient pair-setup.
 #[test]
@@ -350,12 +365,7 @@ fn pairing_goes_on_the_session_connection() {
             Some("application/octet-stream")
         );
         assert_eq!(request.headers.get("X-Apple-HKP"), Some("4"));
-        assert!(
-            request
-                .headers
-                .get("User-Agent")
-                .is_some_and(|ua| ua.starts_with("AudioSync/"))
-        );
+        assert!(!request.headers.contains("User-Agent"));
         for name in ["CSeq", "Client-Instance", "DACP-ID", "Active-Remote"] {
             assert!(request.headers.contains(name), "{name}");
         }

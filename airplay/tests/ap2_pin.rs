@@ -166,7 +166,8 @@ fn pin_pairing_runs_on_one_connection() {
             "{}",
             request.uri
         );
-        for name in ["CSeq", "User-Agent", "Client-Instance", "DACP-ID"] {
+        assert!(!request.headers.contains("User-Agent"));
+        for name in ["CSeq", "Client-Instance", "DACP-ID"] {
             assert!(request.headers.contains(name), "{name} on {}", request.uri);
         }
     }

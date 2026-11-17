@@ -231,6 +231,8 @@ pub struct Answered {
 
 pub struct FakeAp2 {
     pub hap: FakeHomeKit,
+    /// A receiver that refuses requests with a custom sender User-Agent.
+    pub reject_sender_user_agent: bool,
     /// The body of the answer to the first `/info`.
     pub info_body: Vec<u8>,
     /// Every request read, in order, with whether it arrived framed.
@@ -322,6 +324,7 @@ impl FakeAp2 {
     pub fn new() -> FakeAp2 {
         FakeAp2 {
             hap: FakeHomeKit::new("3939"),
+            reject_sender_user_agent: false,
             info_body: plist(dict(&[
                 ("features", int(0x4_0000_0000 | 0x1_0000_0000_0000)),
                 ("statusFlags", int(0x4)),
@@ -540,6 +543,8 @@ impl FakeAp2 {
             }
             let mut response = if key == "UNPARSEABLE" {
                 Response::new(400, "Bad Request")
+            } else if self.reject_sender_user_agent && request.headers.contains("User-Agent") {
+                Response::new(403, "Forbidden")
             } else if challenged {
                 let mut response = Response::new(401, "Unauthorized");
                 let value = self.challenge.as_ref().map(|(_, v)| v.clone());

@@ -1,3 +1,5 @@
+Fork-specific compatibility changes and build notes: [FORK.md](FORK.md).
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="brand/audiosync-icon-dark.svg">

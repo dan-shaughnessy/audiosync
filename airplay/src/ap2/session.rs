@@ -1635,7 +1635,9 @@ impl Ap2Session {
             request.headers.push("Authorization", value);
             nonce = Some(auth.challenge.nonce.clone());
         }
-        request.headers.push("User-Agent", crate::user_agent());
+        // AirTunes/1005.13.5 rejects custom User-Agent tokens before pairing.
+        // This optional header is omitted; the session body still identifies
+        // AudioSync, and pairing/encryption are unchanged.
         request
             .headers
             .push("Client-Instance", self.ids.client_instance_hex());

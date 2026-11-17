@@ -278,3 +278,15 @@ Tests: `tests/ap2_session.rs` against the sans-I/O fake receiver of `tests/commo
 
 `tests/spec_coverage.rs` reads the spec and fails unless every clause is named by a `// covers:` line or listed in `tests/spec_pending.txt`, never both. A clause counts as covered only when everything it asks of the sender is done; a test for part of a pending clause says "Part of P6" in a plain comment. After the audio, RTP and timing stage: 144 clauses, 101 covered, 43 pending (stream and transport 8, pairing crypto 14, AirPlay 2 21). After the transport stage: 109 covered, 35 pending (pairing crypto 14, AirPlay 2 21). After the pairing stage: 123 covered, 21 pending (all AirPlay 2). After the refined spec (P145 added): 145 clauses, 124 covered, 21 pending (all AirPlay 2; P43's new requirement waits for the AirPlay 2 session SETUP). After the input limits went into the spec (P146 to P148: RTSP size limits, header line reading, pairing answer cap): 148 clauses, 127 covered, 21 pending. After the AirPlay 2 switch and HomeKit pairing stage: 170 clauses, 142 covered, 28 pending (all AirPlay 2; P149 partly done). After the AirPlay 2 session stage: 158 covered, 12 pending (P149 and P153 partly done, waiting for the host-driven PIN pairing; the audio packets P155 and P156; the PTP service P158 to P163, P166 and P167). After the AirPlay 2 audio stage: 168 covered, 2 pending (P149 and P153, partly done, waiting for the host-driven PIN pairing). After the host-driven PIN pairing and the stereo pair and group stages: 181 clauses, all covered, none pending.
  The test also checks that the IDs run P1 to Pn without gaps and that every clause names a source.
+
+## macOS receiver compatibility (2026-11-17)
+
+The fork omits the optional User-Agent header on AirPlay 2 requests. A
+macOS 27.2.1 receiver (AirTunes/1005.13.5) rejected GET /info from
+AudioSync/0.1.0 with 403 and no CSeq. Identical requests without that
+header returned 200 with CSeq. This is a tested exception to P5/P22:
+the session SETUP body still names AudioSync, while the legacy AirPlay
+path retains its existing header. Pairing and encryption are unchanged.
+The receiver_rejecting_custom_user_agent_can_complete_pairing_and_setup
+regression exercises the complete session against a receiver that
+refuses requests carrying the header.
