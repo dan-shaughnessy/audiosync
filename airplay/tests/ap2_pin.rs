@@ -125,7 +125,9 @@ fn every_time_receiver() -> FakeAp2 {
 // covers: P149, P153
 #[test]
 fn pin_pairing_runs_on_one_connection() {
-    let mut rig = PinRig::new(pin_receiver());
+    let mut fake = pin_receiver();
+    fake.reject_sender_user_agent = true;
+    let mut rig = PinRig::new(fake);
     assert_eq!(rig.fake.keys(), ["GET /info", "POST /pair-pin-start"]);
     let (start, framed) = &rig.fake.requests[1];
     assert!(!framed);
@@ -166,7 +168,7 @@ fn pin_pairing_runs_on_one_connection() {
             "{}",
             request.uri
         );
-        assert!(!request.headers.contains("User-Agent"));
+        assert_eq!(request.headers.get("User-Agent"), Some("AirPlay/1005.13.5"));
         for name in ["CSeq", "Client-Instance", "DACP-ID"] {
             assert!(request.headers.contains(name), "{name} on {}", request.uri);
         }

@@ -281,12 +281,10 @@ Tests: `tests/ap2_session.rs` against the sans-I/O fake receiver of `tests/commo
 
 ## macOS receiver compatibility (2026-11-17)
 
-The fork omits the optional User-Agent header on AirPlay 2 requests. A
-macOS 27.2.1 receiver (AirTunes/1005.13.5) rejected GET /info from
-AudioSync/0.1.0 with 403 and no CSeq. Identical requests without that
-header returned 200 with CSeq. This is a tested exception to P5/P22:
-the session SETUP body still names AudioSync, while the legacy AirPlay
-path retains its existing header. Pairing and encryption are unchanged.
-The receiver_rejecting_custom_user_agent_can_complete_pairing_and_setup
-regression exercises the complete session against a receiver that
-refuses requests carrying the header.
+AirPlay 2 requests use the compatibility User-Agent AirPlay/1005.13.5.
+AirTunes/1005.13.5 on macOS 27.2.1 rejects AudioSync/0.1.0 before
+pairing. An omitted header passes GET /info but is rejected on
+POST /pair-pin-start, so omission alone is insufficient. The session
+SETUP body still names AudioSync; pairing, encryption and receiver
+approval are unchanged. This is a compatibility exception to P5/P22.
+The legacy AirPlay path retains its original User-Agent.

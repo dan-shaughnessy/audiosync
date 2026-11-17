@@ -9,13 +9,14 @@ This fork starts from v0.9.2, commit
 
 AirTunes/1005.13.5 on macOS 27.2.1 rejects the custom
 `User-Agent: AudioSync/0.1.0` header with HTTP/RTSP 403 before pairing.
-A controlled receiver test returned 200 for the same request without
-that optional header. The AirPlay 2 request builder therefore omits it.
+Omitting the header passed GET /info but failed POST /pair-pin-start.
+The AirPlay 2 request builder therefore uses the compatibility product
+token `AirPlay/1005.13.5`.
 The SETUP body still identifies AudioSync; pairing, encryption and
 receiver approval are unchanged. Legacy AirPlay requests are unchanged.
 
 The regression test exercises pairing and stream setup with a fake
-receiver that refuses requests containing User-Agent. The existing
+receiver that refuses requests without the compatible product token. The existing
 AirPlay 2 session and PIN-pairing suites cover the rest of the handshake.
 
 Build using docs/DEVELOPMENT.md. Local builds disable the upstream

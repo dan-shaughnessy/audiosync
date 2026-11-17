@@ -231,7 +231,7 @@ pub struct Answered {
 
 pub struct FakeAp2 {
     pub hap: FakeHomeKit,
-    /// A receiver that refuses requests with a custom sender User-Agent.
+    /// A receiver that requires an AirPlay-compatible User-Agent.
     pub reject_sender_user_agent: bool,
     /// The body of the answer to the first `/info`.
     pub info_body: Vec<u8>,
@@ -543,7 +543,9 @@ impl FakeAp2 {
             }
             let mut response = if key == "UNPARSEABLE" {
                 Response::new(400, "Bad Request")
-            } else if self.reject_sender_user_agent && request.headers.contains("User-Agent") {
+            } else if self.reject_sender_user_agent
+                && request.headers.get("User-Agent") != Some("AirPlay/1005.13.5")
+            {
                 Response::new(403, "Forbidden")
             } else if challenged {
                 let mut response = Response::new(401, "Unauthorized");

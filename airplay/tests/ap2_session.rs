@@ -119,7 +119,7 @@ fn receiver_rejecting_custom_user_agent_can_complete_pairing_and_setup() {
     let rig = Ap2Rig::new(ap2_config(), fake);
     assert!(rig.ready(), "{:?} {:?}", rig.keys(), rig.events);
     for (request, _) in &rig.fake.requests {
-        assert!(!request.headers.contains("User-Agent"), "{}", request.uri);
+        assert_eq!(request.headers.get("User-Agent"), Some("AirPlay/1005.13.5"));
         assert!(request.headers.contains("CSeq"));
         assert!(request.headers.contains("Client-Instance"));
     }
@@ -365,7 +365,7 @@ fn pairing_goes_on_the_session_connection() {
             Some("application/octet-stream")
         );
         assert_eq!(request.headers.get("X-Apple-HKP"), Some("4"));
-        assert!(!request.headers.contains("User-Agent"));
+        assert_eq!(request.headers.get("User-Agent"), Some("AirPlay/1005.13.5"));
         for name in ["CSeq", "Client-Instance", "DACP-ID", "Active-Remote"] {
             assert!(request.headers.contains(name), "{name}");
         }
