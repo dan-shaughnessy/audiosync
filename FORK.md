@@ -24,6 +24,15 @@ updater, and the first launch may require fresh audio-capture approval
 because the local signing identity differs from the upstream release.
 Keep the original app bundle as a rollback copy before installation.
 
+## Hardware validation (2026-11-17)
+
+The compatibility build completed receiver consent and PIN pairing on
+macOS 27.2.1, then streamed audio with successful timing replies. The
+listener confirmed audible playback. Automatic reconnection after a
+further receiver reboot has not been tested; a reservation and a passing
+handshake do not prove that behavior. Receiver consent still requires
+user interaction.
+
 ## Planned channel routing
 
 Per-output Stereo, Left to Both, and Right to Both routing is not yet
